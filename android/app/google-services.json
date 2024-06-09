@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "378448577176",
+    "project_id": "sakanifychat",
+    "storage_bucket": "sakanifychat.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:378448577176:android:bae24d2f34f1c38fddc6ed",
+        "android_client_info": {
+          "package_name": "com.example.sakanifychat"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA_EtRACkWkIRRcZS86xkWdDhy2I224Z1I"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
