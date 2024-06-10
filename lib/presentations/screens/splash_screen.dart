@@ -1,45 +1,56 @@
 import 'dart:async';
+import 'dart:developer';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:sakanifychat/helper/apis.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:sakanifychat/presentations/screens/home_screen.dart';
 import 'package:sakanifychat/presentations/screens/start_screen.dart';
-import 'package:sakanifychat/presentations/screens/auth/login/loginfor_owner.dart';
 
-class SplashScreen extends StatelessWidget {
+class SplashScreen extends StatefulWidget {
   const SplashScreen({Key? key}) : super(key: key);
+
+  @override
+  State<SplashScreen> createState() => _SplashScreenState();
+}
+
+class _SplashScreenState extends State<SplashScreen> {
+  void initState() {
+    super.initState();
+    Future.delayed(const Duration(seconds: 2), () {
+      //exit full-screen
+      SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+      SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+          systemNavigationBarColor: Colors.white,
+          statusBarColor: Colors.white));
+
+      if (APIs.auth.currentUser != null) {
+        log('\nUser: ${APIs.auth.currentUser}');
+        //navigate to home screen
+        Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: (_) => const HomeScreen()));
+      } else {
+        //navigate to login screen
+        Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: (_) => const StartScreen()));
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xffF3F3F3),
-      body: FutureBuilder<bool>(
-        future: _checkUserLoggedIn(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            // Show loading indicator
-            return _buildLoadingIndicator();
-          } else if (snapshot.hasError) {
-            // Show error message
-            return _buildErrorMessage(snapshot.error.toString());
-          } else {
-            // User authentication check complete
-            final bool isLoggedIn = snapshot.data ?? false;
-            // Navigate based on user authentication status
-            return _navigateToNextScreen(isLoggedIn);
-          }
-        },
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          _buildLoadingIndicator(),
+        ],
       ),
     );
   }
 
-  Future<bool> _checkUserLoggedIn() async {
-    // Wait for a short duration to simulate initialization
-    await Future.delayed(const Duration(seconds: 2));
-    // Check if the user is logged in
-    return APIs.auth.currentUser != null;
-  }
-
+  // Future<bool> _checkUserLoggedIn() async {
   Widget _buildLoadingIndicator() {
     return Center(
       child: Column(
@@ -61,15 +72,5 @@ class SplashScreen extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  Widget _buildErrorMessage(String errorMessage) {
-    return Center(
-      child: Text(errorMessage),
-    );
-  }
-
-  Widget _navigateToNextScreen(bool isLoggedIn) {
-    return isLoggedIn ? const LoginOwner() : const StartScreen();
   }
 }

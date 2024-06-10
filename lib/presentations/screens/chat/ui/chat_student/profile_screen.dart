@@ -2,25 +2,27 @@ import 'dart:io';
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:sakanifychat/helper/apis.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:sakanifychat/helper/dialogs.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:sakanifychat/helper/apis_studentd.dart';
 import 'package:sakanifychat/models/chat/chat_user.dart';
+import 'package:sakanifychat/models/chat/chat_student.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:sakanifychat/presentations/screens/chat/ui/chat_student/chat_screen.dart';
 import 'package:sakanifychat/presentations/screens/auth/login/login_owner/loginfor_owner.dart';
 
 //profile screen -- to show signed in user info
-class ProfileScreen extends StatefulWidget {
-  final ChatUser user;
+class ProfileScreenStudents extends StatefulWidget {
+  final ChatUserStudent user;
 
-  const ProfileScreen({super.key, required this.user});
+  const ProfileScreenStudents({super.key, required this.user});
 
   @override
-  State<ProfileScreen> createState() => _ProfileScreenState();
+  State<ProfileScreenStudents> createState() => _ProfileScreenStudentsState();
 }
 
-class _ProfileScreenState extends State<ProfileScreen> {
+class _ProfileScreenStudentsState extends State<ProfileScreenStudents> {
   final _formKey = GlobalKey<FormState>();
   String? _image;
 
@@ -101,7 +103,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                     TextFormField(
                       initialValue: widget.user.name,
-                      onSaved: (val) => APIs.me.name = val ?? '',
+                      onSaved: (val) => APIsStudents.me.name = val ?? '',
                       validator: (val) => val != null && val.isNotEmpty
                           ? null
                           : 'Required Field',
@@ -118,7 +120,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                     TextFormField(
                       initialValue: widget.user.about,
-                      onSaved: (val) => APIs.me.about = val ?? '',
+                      onSaved: (val) => APIsStudents.me.about = val ?? '',
                       validator: (val) => val != null && val.isNotEmpty
                           ? null
                           : 'Required Field',
@@ -141,7 +143,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       onPressed: () {
                         if (_formKey.currentState!.validate()) {
                           _formKey.currentState!.save();
-                          APIs.updateUserInfo().then((value) {
+                          APIsStudents.updateUserInfo().then((value) {
                             Dialogs.showSnackbar(
                                 context, 'Profile Updated Successfully!');
                           });
@@ -168,9 +170,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
             //for showing progress dialog
             Dialogs.showProgressBar(context);
 
-            await APIs.updateActiveStatus(false);
+            await APIsStudents.updateActiveStatus(false);
 
-            await APIs.auth.signOut().then((value) async {
+            await APIsStudents.auth.signOut().then((value) async {
               await GoogleSignIn().signOut().then((value) {
                 //for hiding progress dialog
                 Navigator.pop(context);
@@ -239,7 +241,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             _image = image.path;
                           });
 
-                          APIs.updateProfileImage(File(_image!));
+                          APIsStudents.updateProfileImage(File(_image!));
 
                           if (mounted) Navigator.pop(context);
                         }
@@ -262,7 +264,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             _image = image.path;
                           });
 
-                          APIs.updateProfileImage(File(_image!));
+                          APIsStudents.updateProfileImage(File(_image!));
 
                           if (mounted) Navigator.pop(context);
                         }

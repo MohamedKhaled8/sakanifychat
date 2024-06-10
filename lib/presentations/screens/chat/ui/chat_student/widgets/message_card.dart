@@ -1,30 +1,32 @@
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:sakanifychat/main.dart';
-import 'package:sakanifychat/helper/apis.dart';
 import 'package:gallery_saver/gallery_saver.dart';
 import 'package:sakanifychat/helper/dialogs.dart';
+import '../../../../../../helper/apis_studentd.dart';
 import 'package:sakanifychat/helper/my_date_util.dart';
-import 'package:sakanifychat/models/chat/message.dart';
+import 'package:sakanifychat/models/message_students.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:sakanifychat/models/chat/message.dart' as chat_message;
+import 'package:sakanifychat/models/message_students.dart' as student_message;
+
 
 // for showing single message details
-class MessageCard extends StatefulWidget {
-  const MessageCard({super.key, required this.message});
+class MessageCardStudents extends StatefulWidget {
+  const MessageCardStudents({super.key, required this.message});
 
-  final Message message;
+  final MessageStudents message;
 
   @override
-  State<MessageCard> createState() => _MessageCardState();
+  State<MessageCardStudents> createState() => _MessageCardStudentsState();
 }
 
-class _MessageCardState extends State<MessageCard> {
+class _MessageCardStudentsState extends State<MessageCardStudents> {
   @override
   Widget build(BuildContext context) {
     var higth = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
-    bool isMe = APIs.user.uid == widget.message.fromId;
+    bool isMe = APIsStudents.user.uid == widget.message.fromId;
     return InkWell(
         onLongPress: () {
           _showBottomSheet(isMe);
@@ -38,7 +40,7 @@ class _MessageCardState extends State<MessageCard> {
     var width = MediaQuery.of(context).size.width;
     //update last read message if sender and receiver are different
     if (widget.message.read.isEmpty) {
-      APIs.updateMessageReadStatus(widget.message);
+      APIsStudents.updateMessageReadStatus(widget.message);
     }
 
     return Row(
@@ -48,7 +50,7 @@ class _MessageCardState extends State<MessageCard> {
         Flexible(
           child: Container(
             padding: EdgeInsets.all(
-                widget.message.type == Type.image ? width * .03 : width * .04),
+                widget.message.type == student_message.Type.image ? width * .03 : width * .04),
             margin: EdgeInsets.symmetric(
                 horizontal: width * .04, vertical: higth * .01),
             decoration: BoxDecoration(
@@ -59,7 +61,7 @@ class _MessageCardState extends State<MessageCard> {
                     topLeft: Radius.circular(30),
                     topRight: Radius.circular(30),
                     bottomRight: Radius.circular(30))),
-            child: widget.message.type == Type.text
+            child: widget.message.type == student_message.Type.text
                 ?
                 //show text
                 Text(
@@ -130,7 +132,7 @@ class _MessageCardState extends State<MessageCard> {
         Flexible(
           child: Container(
             padding: EdgeInsets.all(
-                widget.message.type == Type.image ? width * .03 : width * .04),
+                widget.message.type == student_message.Type.image ? width * .03 : width * .04),
             margin: EdgeInsets.symmetric(
                 horizontal: width * .04, vertical: higth * .01),
             decoration: BoxDecoration(
@@ -141,7 +143,7 @@ class _MessageCardState extends State<MessageCard> {
                     topLeft: Radius.circular(30),
                     topRight: Radius.circular(30),
                     bottomLeft: Radius.circular(30))),
-            child: widget.message.type == Type.text
+            child: widget.message.type == student_message.Type.text
                 ?
                 //show text
                 Text(
@@ -190,7 +192,7 @@ class _MessageCardState extends State<MessageCard> {
                     color: Colors.grey, borderRadius: BorderRadius.circular(8)),
               ),
 
-              widget.message.type == Type.text
+              widget.message.type == student_message.Type.text
                   ?
                   //copy option
                   _OptionItem(
@@ -240,7 +242,7 @@ class _MessageCardState extends State<MessageCard> {
                 ),
 
               //edit option
-              if (widget.message.type == Type.text && isMe)
+              if (widget.message.type ==student_message. Type.text && isMe)
                 _OptionItem(
                     icon: const Icon(Icons.edit, color: Colors.blue, size: 26),
                     name: 'Edit Message',
@@ -258,7 +260,7 @@ class _MessageCardState extends State<MessageCard> {
                         color: Colors.red, size: 26),
                     name: 'Delete Message',
                     onTap: () async {
-                      await APIs.deleteMessage(widget.message)
+                      await APIsStudents.deleteMessage(widget.message)
                           .then((value) {
                         //for hiding bottom sheet
                         Navigator.pop(context);
@@ -344,7 +346,7 @@ class _MessageCardState extends State<MessageCard> {
                     onPressed: () {
                       //hide alert dialog
                       Navigator.pop(context);
-                      APIs.updateMessage(widget.message, updatedMsg);
+                      APIsStudents.updateMessage(widget.message, updatedMsg);
                     },
                     child: const Text(
                       'Update',

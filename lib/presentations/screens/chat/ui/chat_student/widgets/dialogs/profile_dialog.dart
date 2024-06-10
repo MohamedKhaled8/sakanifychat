@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:sakanifychat/models/chat/chat_user.dart';
+import '../../view_profile_screen.dart';
+import 'package:sakanifychat/models/chat/chat_student.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:sakanifychat/presentations/screens/chat/ui/view_profile_screen.dart';
 
-class ProfileDialog extends StatelessWidget {
-  const ProfileDialog({super.key, required this.user});
 
-  final ChatUser user;
+class ProfileDialogStudents extends StatelessWidget {
+  const ProfileDialogStudents({super.key, required this.user});
+
+  final ChatUserStudent user;
 
   @override
   Widget build(BuildContext context) {
@@ -62,7 +63,7 @@ class ProfileDialog extends StatelessWidget {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (_) => ViewProfileScreen(user: user)));
+                              builder: (_) => ViewProfileScreenStudents(user: user)));
                     },
                     minWidth: 0,
                     padding: const EdgeInsets.all(0),

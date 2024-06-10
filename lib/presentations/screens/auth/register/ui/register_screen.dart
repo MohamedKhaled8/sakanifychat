@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../../login/loginfor_owner.dart';
 import '../../../../../helper/validator.dart';
 import 'package:sakanifychat/helper/apis.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../../login/login_owner/loginfor_owner.dart';
 import 'package:sakanifychat/widgets/text_filed/custom_text_form_field.dart';
 
 class RegisterScreenOwner extends StatefulWidget {
@@ -34,7 +34,8 @@ class _RegisterScreenOwnerState extends State<RegisterScreenOwner> {
 
     try {
       if (_formKey.currentState?.validate() ?? false) {
-        final userCredential = await APIs.auth.createUserWithEmailAndPassword(
+        final userCredential =
+            await APIs.auth.createUserWithEmailAndPassword(
           email: _emailController.text.trim(),
           password: _passwordController.text,
         );

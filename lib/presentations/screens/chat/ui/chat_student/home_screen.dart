@@ -1,28 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:sakanifychat/helper/apis.dart';
 import 'package:sakanifychat/helper/dialogs.dart';
-import 'package:sakanifychat/models/chat/chat_user.dart';
-import 'package:sakanifychat/presentations/screens/chat/ui/profile_screen.dart';
-import 'package:sakanifychat/presentations/screens/chat/widgets/chat_user_card.dart';
+import 'package:sakanifychat/helper/apis_studentd.dart';
+import 'package:sakanifychat/models/chat/chat_student.dart';
+import 'package:sakanifychat/presentations/screens/chat/ui/chat_student/profile_screen.dart';
+import 'package:sakanifychat/presentations/screens/chat/ui/chat_student/widgets/chat_user_card.dart';
 
-class HomeScreenChat extends StatefulWidget {
-  const HomeScreenChat({Key? key}) : super(key: key);
+class HomeScreenChatStudents extends StatefulWidget {
+  const HomeScreenChatStudents({Key? key}) : super(key: key);
 
   @override
-  State<HomeScreenChat> createState() => _HomeScreenChatState();
+  State<HomeScreenChatStudents> createState() => _HomeScreenChatStudentsState();
 }
 
-class _HomeScreenChatState extends State<HomeScreenChat> {
-  List<ChatUser> _list = [];
-  final List<ChatUser> _searchList = [];
+class _HomeScreenChatStudentsState extends State<HomeScreenChatStudents> {
+  List<ChatUserStudent> _list = [];
+  final List<ChatUserStudent> _searchList = [];
   bool _isSearching = false;
 
   @override
   void initState() {
     super.initState();
-    APIs.getSelfInfo();
+    APIsStudents.getSelfInfo();
 
     //for updating user active status according to lifecycle events
     //resume -- active or online
@@ -30,12 +30,12 @@ class _HomeScreenChatState extends State<HomeScreenChat> {
     SystemChannels.lifecycle.setMessageHandler((message) {
       debugPrint('Message: $message');
 
-      if (APIs.auth.currentUser != null) {
+      if (APIsStudents.auth.currentUser != null) {
         if (message.toString().contains('resume')) {
-          APIs.updateActiveStatus(true);
+          APIsStudents.updateActiveStatus(true);
         }
         if (message.toString().contains('pause')) {
-          APIs.updateActiveStatus(false);
+          APIsStudents.updateActiveStatus(false);
         }
       }
 
@@ -53,9 +53,9 @@ class _HomeScreenChatState extends State<HomeScreenChat> {
         onWillPop: () async {
           if (_isSearching) {
             setState(() => _isSearching = !_isSearching);
-            return false; // Prevent route from being popped
+            return false;
           } else {
-            return true; // Allow route to be popped
+            return true;
           }
         },
         child: Scaffold(
@@ -104,7 +104,8 @@ class _HomeScreenChatState extends State<HomeScreenChat> {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (_) => ProfileScreen(user: APIs.me)));
+                            builder: (_) =>
+                                ProfileScreenStudents(user: APIsStudents.me)));
                   },
                   icon: const Icon(Icons.more_vert))
             ],
@@ -123,7 +124,7 @@ class _HomeScreenChatState extends State<HomeScreenChat> {
 
           //body
           body: StreamBuilder(
-            stream: APIs.getMyUsersId(),
+            stream: APIsStudents.getMyUsersId(),
 
             //get id of only known users
             builder: (context, snapshot) {
@@ -137,7 +138,7 @@ class _HomeScreenChatState extends State<HomeScreenChat> {
                 case ConnectionState.active:
                 case ConnectionState.done:
                   return StreamBuilder(
-                    stream: APIs.getAllUsers(
+                    stream: APIsStudents.getAllUsers(
                         snapshot.data?.docs.map((e) => e.id).toList() ?? []),
 
                     //get only those user, who's ids are provided
@@ -154,7 +155,8 @@ class _HomeScreenChatState extends State<HomeScreenChat> {
                         case ConnectionState.done:
                           final data = snapshot.data?.docs;
                           _list = data
-                                  ?.map((e) => ChatUser.fromJson(e.data()))
+                                  ?.map(
+                                      (e) => ChatUserStudent.fromJson(e.data()))
                                   .toList() ??
                               [];
 
@@ -166,7 +168,7 @@ class _HomeScreenChatState extends State<HomeScreenChat> {
                                 padding: EdgeInsets.only(top: higth * .01),
                                 physics: const BouncingScrollPhysics(),
                                 itemBuilder: (context, index) {
-                                  return ChatUserCard(
+                                  return ChatUserCardStudents(
                                       user: _isSearching
                                           ? _searchList[index]
                                           : _list[index]);
@@ -252,10 +254,10 @@ class _HomeScreenChatState extends State<HomeScreenChat> {
                     onPressed: () async {
                       Navigator.pop(context); // Close the dialog sheet
                       if (email.isNotEmpty) {
-                        bool userAdded = await APIs.addChatUser(email);
+                        bool userAdded = await APIsStudents.addChatUser(email);
                         if (userAdded) {
                           // Add the new user to the listش
-                          ChatUser newUser = ChatUser(
+                          ChatUserStudent newUser = ChatUserStudent(
                               image: '',
                               about: '',
                               name: email,

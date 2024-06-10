@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:sakanifychat/presentations/screens/loginfor_student.dart';
-import 'package:sakanifychat/presentations/screens/auth/login/loginfor_owner.dart';
+import 'package:sakanifychat/presentations/screens/auth/login/login_owner/loginfor_owner.dart';
+import 'package:sakanifychat/presentations/screens/auth/login/login_for_student/loginfor_student.dart';
 
 
 class StartScreen extends StatelessWidget {

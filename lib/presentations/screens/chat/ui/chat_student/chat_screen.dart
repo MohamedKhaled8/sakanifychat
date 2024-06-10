@@ -1,32 +1,32 @@
 import 'dart:io';
 import 'dart:developer';
-import 'view_profile_screen.dart';
-import '../widgets/message_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:sakanifychat/helper/apis.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:sakanifychat/helper/my_date_util.dart';
-import 'package:sakanifychat/models/chat/message.dart';
-import 'package:sakanifychat/models/chat/chat_user.dart';
+import '../../../../../helper/my_date_util.dart';
+import 'package:sakanifychat/helper/apis_studentd.dart';
+import 'package:sakanifychat/models/message_students.dart';
+import 'package:sakanifychat/models/chat/chat_student.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
+import 'package:sakanifychat/presentations/screens/chat/ui/chat_student/view_profile_screen.dart';
+import 'package:sakanifychat/presentations/screens/chat/ui/chat_student/widgets/message_card.dart';
 
-class ChatScreen extends StatefulWidget {
-  final ChatUser user;
+class ChatScreenStudents extends StatefulWidget {
+  final ChatUserStudent user;
 
-  const ChatScreen({super.key, required this.user});
+  const ChatScreenStudents({super.key, required this.user});
 
   @override
-  State<ChatScreen> createState() => _ChatScreenState();
+  State<ChatScreenStudents> createState() => _ChatScreenStudentsState();
 }
 
-class _ChatScreenState extends State<ChatScreen> {
+class _ChatScreenStudentsState extends State<ChatScreenStudents> {
   //for storing all messages
-  List<Message> _list = [];
+  List<MessageStudents> _list = [];
 
   //for handling message text changes
-  final _textController = TextEditingController();
+  final TextEditingController _textController = TextEditingController();
 
   //showEmoji -- for storing value of showing or hiding emoji
   //isUploading -- for checking if image is uploading or not?
@@ -39,23 +39,13 @@ class _ChatScreenState extends State<ChatScreen> {
     return GestureDetector(
       onTap: FocusScope.of(context).unfocus,
       child: WillPopScope(
-        // onWillPop: () {
-        //   if (_showEmoji) {
-        //     setState(() => _showEmoji = !_showEmoji);
-        //     return Future.value(false);
-        //   } else {
-        //     return Future.value(true);
-        //   }
-        // },
-
-        //if emojis are shown & back button is pressed then hide emojis
-        //or else simple close current screen on back button click
+    
         onWillPop: () async {
           if (_showEmoji) {
             setState(() => _showEmoji = !_showEmoji);
-            return false; // Returning false prevents the route from being popped
+            return false; 
           } else {
-            return true; // Returning true allows the route to be popped
+            return true; 
           }
         },
 
@@ -75,7 +65,7 @@ class _ChatScreenState extends State<ChatScreen> {
               children: [
                 Expanded(
                   child: StreamBuilder(
-                    stream: APIs.getAllMessages(widget.user),
+                    stream: APIsStudents.getAllMessagesStudents(widget.user),
                     builder: (context, snapshot) {
                       switch (snapshot.connectionState) {
                         //if data is loading
@@ -88,7 +78,8 @@ class _ChatScreenState extends State<ChatScreen> {
                         case ConnectionState.done:
                           final data = snapshot.data?.docs;
                           _list = data
-                                  ?.map((e) => Message.fromJson(e.data()))
+                                  ?.map(
+                                      (e) => MessageStudents.fromJson(e.data()))
                                   .toList() ??
                               [];
 
@@ -99,7 +90,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                 padding: EdgeInsets.only(top: higth * .01),
                                 physics: const BouncingScrollPhysics(),
                                 itemBuilder: (context, index) {
-                                  return MessageCard(message: _list[index]);
+                                  return MessageCardStudents(message: _list[index]);
                                 });
                           } else {
                             return const Center(
@@ -143,7 +134,6 @@ class _ChatScreenState extends State<ChatScreen> {
 
   // app bar widget
   Widget _appBar() {
-    
     var higth = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
     return SafeArea(
@@ -152,15 +142,17 @@ class _ChatScreenState extends State<ChatScreen> {
             Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (_) => ViewProfileScreen(user: widget.user)));
+                    builder: (_) =>
+                        ViewProfileScreenStudents(user: widget.user)));
           },
           child: StreamBuilder(
-              stream: APIs.getUserInfo(widget.user),
+              stream: APIsStudents.getUserInfoStudents(widget.user),
               builder: (context, snapshot) {
                 final data = snapshot.data?.docs;
-                final list =
-                    data?.map((e) => ChatUser.fromJson(e.data())).toList() ??
-                        [];
+                final list = data
+                        ?.map((e) => ChatUserStudent.fromJson(e.data()))
+                        .toList() ??
+                    [];
 
                 return Row(
                   children: [
@@ -197,7 +189,7 @@ class _ChatScreenState extends State<ChatScreen> {
                         Text(list.isNotEmpty ? list[0].name : widget.user.name,
                             style: const TextStyle(
                                 fontSize: 16,
-                                color: Colors.white,
+                                color: Colors.black87,
                                 fontWeight: FontWeight.w500)),
 
                         //for adding some space
@@ -215,7 +207,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                     context: context,
                                     lastActive: widget.user.lastActive),
                             style: const TextStyle(
-                                fontSize: 13, color: Colors.white)),
+                                fontSize: 13, color: Colors.black54)),
                       ],
                     )
                   ],
@@ -276,7 +268,8 @@ class _ChatScreenState extends State<ChatScreen> {
                         for (var i in images) {
                           log('Image Path: ${i.path}');
                           setState(() => _isUploading = true);
-                          await APIs.sendChatImage(widget.user, File(i.path));
+                          await APIsStudents.sendChatImageStudents(
+                              widget.user, File(i.path));
                           setState(() => _isUploading = false);
                         }
                       },
@@ -295,7 +288,7 @@ class _ChatScreenState extends State<ChatScreen> {
                           log('Image Path: ${image.path}');
                           setState(() => _isUploading = true);
 
-                          await APIs.sendChatImage(
+                          await APIsStudents.sendChatImageStudents(
                               widget.user, File(image.path));
                           setState(() => _isUploading = false);
                         }
@@ -316,11 +309,11 @@ class _ChatScreenState extends State<ChatScreen> {
               if (_textController.text.isNotEmpty) {
                 if (_list.isEmpty) {
                   //on first message (add user to my_user collection of chat user)
-                  APIs.sendFirstMessage(
+                  APIsStudents.sendFirstMessageStudents(
                       widget.user, _textController.text, Type.text);
                 } else {
                   //simply send message
-                  APIs.sendMessage(
+                  APIsStudents.sendMessageStudents(
                       widget.user, _textController.text, Type.text);
                 }
                 _textController.text = '';
@@ -330,7 +323,7 @@ class _ChatScreenState extends State<ChatScreen> {
             padding:
                 const EdgeInsets.only(top: 10, bottom: 10, right: 5, left: 10),
             shape: const CircleBorder(),
-           color: const Color(0xffDDB20C),
+            color: const Color(0xffDDB20C),
             child: const Icon(Icons.send, color: Colors.white, size: 28),
           )
         ],
